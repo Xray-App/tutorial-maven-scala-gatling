@@ -46,7 +46,7 @@ jobs:
         run: |
           pwd
           cat ./target/gatling/lastRun.txt
-          cat ./target/gatling/lastRun.txt >> $env.MYLASTRUN
+          cat ./target/gatling/lastRun.txt >> $MYLASTRUN
           python convert2XrayJson.py --gatlingFile ./target/gatling/${{env.MYLASTRUN}}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{env.MYLASTRUN}}/js/stats.json
 
         env:
