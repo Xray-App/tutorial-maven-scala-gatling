@@ -41,8 +41,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-      - name: Generate Xray Json
-        continue-on-error: true
+      - name: Assign var
         id: output_test
         run: |
           input_file="./target/gatling/lastRun.txt"
@@ -52,6 +51,9 @@ jobs:
           done < "$input_file"
           echo ::set-output name=mylastrun::$file_text
          
+      - name: Generate Xray Json
+        continue-on-error: true
+        run: |
           python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
 
         env:
