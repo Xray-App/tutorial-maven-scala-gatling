@@ -43,6 +43,7 @@ jobs:
           python -m pip install --upgrade pip
       - name: Generate Xray Json
         continue-on-error: true
+        id: output_test
         run: |
           input_file="./target/gatling/lastRun.txt"
           while read line
@@ -51,7 +52,7 @@ jobs:
           done < "$input_file"
           echo ::set-output name=mylastrun::$file_text
          
-          python convert2XrayJson.py --gatlingFile ./target/gatling/${{steps.output_test.outputs.mylastrun}}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{steps.output_test.outputs.mylastrun}}/js/stats.json
+          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
 
         env:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
