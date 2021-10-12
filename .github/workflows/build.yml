@@ -44,10 +44,14 @@ jobs:
       - name: Generate Xray Json
         continue-on-error: true
         run: |
-          pwd
-          cat ./target/gatling/lastRun.txt
-          cat ./target/gatling/lastRun.txt >> $MYLASTRUN
-          python convert2XrayJson.py --gatlingFile ./target/gatling/${{env.MYLASTRUN}}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{env.MYLASTRUN}}/js/stats.json
+          input_file="./target/gatling/lastRun.txt"
+          while read line
+          do
+            file_text=$line
+          done < "$input_file"
+          echo ::set-output name=mylastrun::$file_text
+         
+          python convert2XrayJson.py --gatlingFile ./target/gatling/${{steps.output_test.outputs.mylastrun}}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{steps.output_test.outputs.mylastrun}}/js/stats.json
 
         env:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
