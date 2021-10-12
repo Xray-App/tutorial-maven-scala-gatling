@@ -1,0 +1,74 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Run Gatling tests
+        run: mvn gatling:test
+        env:
+             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: Generate Xray Json
+        continue-on-error: true
+        run: |
+          cat lastRun.txt >> $MYLASTRUN
+          python convert2XrayJson.py --gatlingFile /target/gatling/${{env.MYLASTRUN}}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile /target/gatling/${{env.MYLASTRUN}}/js/stats.json
+
+        env:
+               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: debug Xray Json report
+        run: cat xrayJson.json
+      - name: "Import results to Xray (server/DC)"
+        uses: mikepenz/xray-action@v2.0.0
+        with:
+           username: ${{ secrets.JIRASERVER_USERNAME }}
+           password: ${{ secrets.JIRASERVER_PASSWORD }}
+           xrayCloud: "false"
+           xrayBaseUrl: ${{ secrets.JIRASERVER_BASE_URL }}
+           testFormat: "xray"
+           testPaths: "xrayJson.json"
+           testPlanKey: "${{ secrets.XRAYSERVER_TEST_PLAN_KEY }}"
+           projectKey: "${{ secrets.JIRASERVER_PROJECT_KEY }}"
+      - name: "Import results to Xray (cloud)"
+        uses: mikepenz/xray-action@v2.0.0
+        with:
+           username: "${{ secrets.XRAYCLOUD_CLIENT_ID }}"
+           password: "${{ secrets.XRAYCLOUD_CLIENT_SECRET }}"
+           xrayCloud: "true"
+           testFormat: "xray"
+           testPaths: "xrayJson.json"
+           testPlanKey: "${{ secrets.XRAYCLOUD_TEST_PLAN_KEY }}"
+           projectKey: "${{ secrets.JIRACLOUD_PROJECT_KEY }}"
