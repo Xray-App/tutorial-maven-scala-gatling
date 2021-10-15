@@ -67,6 +67,8 @@ jobs:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: debug Xray Json report
         run: cat xrayJson.json
+      - name: debug Xray Server Json report
+        run: cat xrayServerJson.json
       - name: "Import results to Xray (server/DC)"
         uses: mikepenz/xray-action@v2.0.0
         with:
