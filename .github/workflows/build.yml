@@ -51,10 +51,17 @@ jobs:
           done < "$input_file"
           echo ::set-output name=mylastrun::$file_text
          
-      - name: Generate Xray Json
+      - name: Generate Xray Json Cloud
         continue-on-error: true
         run: |
           python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
+
+        env:
+               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate Xray Json Server
+        continue-on-error: true
+        run: |
+          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayServerJson.json --testKey 'XT-330' --testPlan 'XT-329' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
 
         env:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +75,7 @@ jobs:
            xrayCloud: "false"
            xrayBaseUrl: ${{ secrets.JIRASERVER_BASE_URL }}
            testFormat: "xray"
-           testPaths: "xrayJson.json"
+           testPaths: "xrayServerJson.json"
            testPlanKey: "${{ secrets.XRAYSERVER_TEST_PLAN_KEY }}"
            projectKey: "${{ secrets.JIRASERVER_PROJECT_KEY }}"
       - name: "Import results to Xray (cloud)"
