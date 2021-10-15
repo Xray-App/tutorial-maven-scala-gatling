@@ -63,6 +63,7 @@ jobs:
         run: |
           python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayServerJson.json --testKey 'XT-330' --testPlan 'XT-329' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
           sed -i 's/PASSED/PASS/g' xrayServerJson.json
+          sed -i 's/FAILED/FAIL/g' xrayServerJson.json
         env:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: debug Xray Json report
