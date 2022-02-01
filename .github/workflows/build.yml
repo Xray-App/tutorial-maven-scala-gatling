@@ -71,7 +71,7 @@ jobs:
       - name: debug Xray Server Json report
         run: cat xrayServerJson.json
       - name: "Import results to Xray (server/DC)"
-        uses: mikepenz/xray-action@v2.0.0
+        uses: mikepenz/xray-action@v2.3.0
         with:
            username: ${{ secrets.JIRASERVER_USERNAME }}
            password: ${{ secrets.JIRASERVER_PASSWORD }}
@@ -82,7 +82,7 @@ jobs:
            testPlanKey: "${{ secrets.XRAYSERVER_TEST_PLAN_KEY }}"
            projectKey: "${{ secrets.JIRASERVER_PROJECT_KEY }}"
       - name: "Import results to Xray (cloud)"
-        uses: mikepenz/xray-action@v2.0.0
+        uses: mikepenz/xray-action@v2.3.0
         with:
            username: "${{ secrets.XRAYCLOUD_CLIENT_ID }}"
            password: "${{ secrets.XRAYCLOUD_CLIENT_SECRET }}"
