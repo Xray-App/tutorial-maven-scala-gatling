@@ -1,4 +1,4 @@
-# tutorial-python-locust
+# tutorial-maven-scala-gatling
 
 [![build workflow](https://github.com/Xray-App/tutorial-maven-scala-gatling/actions/workflows/build.yml/badge.svg)](https://github.com/Xray-App/tutorial-maven-scala-gatling/actions/workflows/build.yml)
 [![license](https://img.shields.io/badge/License-BSD%203--Clause-green.svg)](https://opensource.org/licenses/BSD-3-Clause)
