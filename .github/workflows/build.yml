@@ -51,14 +51,14 @@ jobs:
       - name: Generate Xray Json Cloud
         continue-on-error: true
         run: |
-          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
+          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html
 
         env:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Generate Xray Json Server
         continue-on-error: true
         run: |
-          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayServerJson.json --testKey 'XT-330' --testPlan 'XT-329' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
+          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html --outputFile xrayServerJson.json --testKey 'XT-330' --testPlan 'XT-329' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html
           sed -i 's/PASSED/PASS/g' xrayServerJson.json
           sed -i 's/FAILED/FAIL/g' xrayServerJson.json
         env:
