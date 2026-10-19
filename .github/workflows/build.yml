@@ -23,17 +23,17 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-    
-      - name: Set up JDK 8
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v7
+  
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
         with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          python-version: 3.9
+          python-version: 3.15
       - name: Run Gatling tests
         run: mvn gatling:test
         env:
@@ -44,24 +44,21 @@ jobs:
       - name: Assign var
         id: output_test
         run: |
-          input_file="./target/gatling/lastRun.txt"
-          while read line
-          do
-            file_text=$line
-          done < "$input_file"
-          echo ::set-output name=mylastrun::$file_text
+          # gatling-maven-plugin 4.x no longer writes lastRun.txt, so use the newest run folder
+          latest_run=$(ls -td ./target/gatling/*/ | head -1)
+          echo "mylastrun=$(basename "$latest_run")" >> "$GITHUB_OUTPUT"
          
       - name: Generate Xray Json Cloud
         continue-on-error: true
         run: |
-          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
+          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html --outputFile xrayJson.json --testKey 'XT-246' --testPlan 'XT-245' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html
 
         env:
                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Generate Xray Json Server
         continue-on-error: true
         run: |
-          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/assertions.json --outputFile xrayServerJson.json --testKey 'XT-330' --testPlan 'XT-329' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/js/stats.json
+          python convert2XrayJson.py --gatlingFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html --outputFile xrayServerJson.json --testKey 'XT-330' --testPlan 'XT-329' --jiraProject XT --evidenceFile ./target/gatling/${{ steps.output_test.outputs.mylastrun }}/index.html
           sed -i 's/PASSED/PASS/g' xrayServerJson.json
           sed -i 's/FAILED/FAIL/g' xrayServerJson.json
         env:

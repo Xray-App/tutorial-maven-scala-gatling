@@ -1,5 +1,12 @@
-import json, argparse
+import json, argparse, re
 from base64 import b64encode
+
+# Matches one row of the assertions table in the Gatling HTML report: message, then OK or KO
+ASSERTION_ROW = re.compile(
+    r'<td class="error-col-1[^"]*">\s*(.*?)\s*<span class="value"[^>]*>.*?</span>\s*</td>\s*'
+    r'<td class="error-col-2[^"]*">(OK|KO)</td>',
+    re.S
+)
 
 class convert2XrayJson:
     def injectFile(self, fileName):
@@ -46,7 +53,7 @@ class convert2XrayJson:
                         {
                             'data': self.injectFile(evidencefile),
                             'filename': evidencefile.rsplit('/', 1)[-1],
-                            'contentType': 'application/json'
+                            'contentType': 'text/html'
                         }
                     ]
                 })
@@ -78,10 +85,10 @@ data = {}
 data['tests'] = []
 cXray = convert2XrayJson()
 
-with open(gatlingfile) as json_file:
-    filedata = json.load(json_file)
-    for p in filedata['assertions']:
-        cXray.appendToXrayResult(data, testkey, p['target'], p['path'], testplan, p['message'], p['result'], jiraproj, testplan, evidencefile)
+with open(gatlingfile, encoding='utf-8') as html_file:
+    html = html_file.read()
+    for message, status in ASSERTION_ROW.findall(html):
+        cXray.appendToXrayResult(data, testkey, message, 'Gatling', testplan, message, status == 'OK', jiraproj, testplan, evidencefile)
 
 with open(outputfile, 'w') as outfile:
     json.dump(data, outfile)
