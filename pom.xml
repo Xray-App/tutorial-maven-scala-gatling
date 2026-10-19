@@ -16,8 +16,24 @@
         <gatling-maven-plugin.version>3.1.2</gatling-maven-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <scala-maven-plugin.version>4.4.1</scala-maven-plugin.version>
-        <scala.version>2.12.21</scala.version>
+        <scala.version>2.13.18</scala.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Gatling 3.6.1 ships Scala 2.13.6, which cannot read JDK 21 class files -->
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-reflect</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
