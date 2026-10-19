@@ -44,12 +44,9 @@ jobs:
       - name: Assign var
         id: output_test
         run: |
-          input_file="./target/gatling/lastRun.txt"
-          while read line
-          do
-            file_text=$line
-          done < "$input_file"
-          echo ::set-output name=mylastrun::$file_text
+          # gatling-maven-plugin 4.x no longer writes lastRun.txt, so use the newest run folder
+          latest_run=$(ls -td ./target/gatling/*/ | head -1)
+          echo "mylastrun=$(basename "$latest_run")" >> "$GITHUB_OUTPUT"
          
       - name: Generate Xray Json Cloud
         continue-on-error: true
